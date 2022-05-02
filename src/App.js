@@ -6,21 +6,16 @@ import {
   BsFillSkipEndFill,
   BsVolumeUpFill,
   BsVolumeMuteFill,
-  BsFullscreen,
 } from "react-icons/bs";
 
 function App() {
   const videoRef = useRef();
   const ref = useRef();
   const timelineref = useRef();
+  const timer = useRef();
 
   const [videoTime, setVideoTime] = useState();
   const [videoDuration, setVideoDuration] = useState();
-  const [timerStyle, setTimerStyle] = useState({
-    width: 20,
-    backgroundColor: "red",
-    height: 20,
-  });
   const [timelineStyle, setTimelineStyle] = useState({
     width: 550,
     marginLeft: 0,
@@ -71,38 +66,9 @@ function App() {
     }
   };
 
-  const setTime = () => {
-    let minutes = Math.floor(videoRef.current.currentTime / 60);
-    let seconds = Math.floor(videoRef.current.currentTime - minutes * 60);
-    let minuteValue;
-    let secondValue;
-
-    if (minutes < 10) {
-      minuteValue = "0" + minutes;
-    } else {
-      minuteValue = minutes;
-    }
-
-    if (seconds < 10) {
-      secondValue = "0" + seconds;
-    } else {
-      secondValue = seconds;
-    }
-
-    setVideoTime(minuteValue + ":" + secondValue);
-
-    const barLength =
-      550 * (videoRef.current.currentTime / videoRef.current.duration);
-    setTimerStyle({ ...timerStyle, width: barLength });
-  };
-
-  useEffect(() => {
-    setTime();
-  });
 
 
-
-  const setTime2 = () => {
+  const setTime2 = () => { //Hooks
     let minutes = Math.floor(videoRef.current.duration / 60);
     let seconds = Math.floor(videoRef.current.duration - minutes * 60);
     let minuteValue;
@@ -119,19 +85,41 @@ function App() {
     } else {
       secondValue = seconds;
     }
-
     setVideoDuration(minuteValue + ":" + secondValue)
   };
 
   useEffect(() => {
-    setTime2();
-  }, [videoDuration])
-
+    let interval = window.setInterval(()=>{    timeline(); setTime2();  
+    }, 1000)
+    return () => clearInterval(interval);
+  }, []);
+  
   const timeline = (e) => {
-    videoRef.current.currentTime =
-      ((e.pageX - e.target.getBoundingClientRect().left) *
-        videoRef.current.duration) /
-      550;
+    if(e){
+      videoRef.current.currentTime = ((e.pageX - e.target.getBoundingClientRect().left) *
+      videoRef.current.duration) / 550;
+    }
+      let minutes = Math.floor(videoRef.current.currentTime / 60);
+      let seconds = Math.floor(videoRef.current.currentTime - minutes * 60);
+      let minuteValue;
+      let secondValue;
+  
+      if (minutes < 10) {
+        minuteValue = "0" + minutes;
+      } else {
+        minuteValue = minutes;
+      }
+  
+      if (seconds < 10) {
+        secondValue = "0" + seconds;
+      } else {
+        secondValue = seconds;
+      }
+  
+      setVideoTime(minuteValue + ":" + secondValue);
+
+      const barLength = (550 * (videoRef.current.currentTime / videoRef.current.duration)) - (10 / 2);
+      timer.current.style.marginLeft = `${barLength}px`;
   };
 
   const trackUp = (e) => {
@@ -160,10 +148,6 @@ function App() {
     }
   };
 
-  const trackDown = (e) => {
-    setMove(e.target);
-  };
-
   return (
     <div className="App" ref={ref} onMouseMove={trackMove} onMouseUp={trackUp}>
       <div className="player">
@@ -174,36 +158,32 @@ function App() {
           ></source>
           <p>Your browser does not support this video.</p>
         </video>
-
         <div
-          style={{ width: 550, height: 20, backgroundColor: "blue" }}
+          className="band"
           onMouseDown={(e) => timeline(e)}
-        ></div>
-        <div className="timer" style={timerStyle}></div>
-        <div className="time">{videoTime}</div>
-        <div className="time">{videoDuration}</div>
+        >
+        <div className="timer" ref={timer}></div>
+        </div>
+        <div className="time">{videoTime} / {videoDuration}</div>
         <div className="constrols">
-          <div className="play" onClick={() => setIsPlay(!isPlay)}>
-            {isPlay ? <BsPauseFill /> : <BsPlayFill />}
-          </div>
+
           <div className="stop" onClick={restartVideo}>
             <BsFillSkipStartFill />
           </div>
-          <div className="stop" onClick={finishVideo}>
+          <div className="play" onClick={() => setIsPlay(!isPlay)}>
+            {isPlay ? <BsPauseFill /> : <BsPlayFill />}
+          </div>          <div className="stop" onClick={finishVideo}>
             <BsFillSkipEndFill />
           </div>
           <div onClick={videoSpeed}>x{speed}</div>
           <div onClick={() => setIsMute(!isMute)}>
             {isMute ? <BsVolumeMuteFill /> : <BsVolumeUpFill />}
           </div>
-          <div onClick={() => videoRef.current.requestFullscreen()}>
-          <BsFullscreen />
-          </div>
         </div>
         <div className="background-timeline">
           <div className="timeline" ref={timelineref} style={timelineStyle}>
-            <div className="resizer right" onMouseDown={trackDown}></div>
-            <div className="resizer left" onMouseDown={trackDown}></div>
+            <div className="resizer right" onMouseDown={(e)=> setMove(e.target)}></div>
+            <div className="resizer left" onMouseDown={(e)=> setMove(e.target)}></div>
           </div>
         </div>
       </div>
