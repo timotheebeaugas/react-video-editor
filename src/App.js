@@ -6,6 +6,8 @@ import {
   BsFillSkipEndFill,
   BsVolumeUpFill,
   BsVolumeMuteFill,
+  BsArrowBarLeft,
+  BsArrowBarRight,
 } from "react-icons/bs";
 
 function App() {
@@ -66,9 +68,8 @@ function App() {
     }
   };
 
-
-
-  const setTime2 = () => { //Hooks
+  const setTime2 = () => {
+    //Hooks
     let minutes = Math.floor(videoRef.current.duration / 60);
     let seconds = Math.floor(videoRef.current.duration - minutes * 60);
     let minuteValue;
@@ -85,41 +86,46 @@ function App() {
     } else {
       secondValue = seconds;
     }
-    setVideoDuration(minuteValue + ":" + secondValue)
+    setVideoDuration(minuteValue + ":" + secondValue);
   };
 
   useEffect(() => {
-    let interval = window.setInterval(()=>{    timeline(); setTime2();  
-    }, 1000)
+    let interval = window.setInterval(() => {
+      timeline();
+      setTime2();
+    }, 100);
     return () => clearInterval(interval);
   }, []);
-  
-  const timeline = (e) => {
-    if(e){
-      videoRef.current.currentTime = ((e.pageX - e.target.getBoundingClientRect().left) *
-      videoRef.current.duration) / 550;
-    }
-      let minutes = Math.floor(videoRef.current.currentTime / 60);
-      let seconds = Math.floor(videoRef.current.currentTime - minutes * 60);
-      let minuteValue;
-      let secondValue;
-  
-      if (minutes < 10) {
-        minuteValue = "0" + minutes;
-      } else {
-        minuteValue = minutes;
-      }
-  
-      if (seconds < 10) {
-        secondValue = "0" + seconds;
-      } else {
-        secondValue = seconds;
-      }
-  
-      setVideoTime(minuteValue + ":" + secondValue);
 
-      const barLength = (550 * (videoRef.current.currentTime / videoRef.current.duration)) - (10 / 2);
-      timer.current.style.marginLeft = `${barLength}px`;
+  const timeline = (e) => {
+    if (e) {
+      videoRef.current.currentTime =
+        ((e.pageX - e.target.getBoundingClientRect().left) *
+          videoRef.current.duration) /
+        550;
+    }
+    let minutes = Math.floor(videoRef.current.currentTime / 60);
+    let seconds = Math.floor(videoRef.current.currentTime - minutes * 60);
+    let minuteValue;
+    let secondValue;
+
+    if (minutes < 10) {
+      minuteValue = "0" + minutes;
+    } else {
+      minuteValue = minutes;
+    }
+
+    if (seconds < 10) {
+      secondValue = "0" + seconds;
+    } else {
+      secondValue = seconds;
+    }
+
+    setVideoTime(minuteValue + ":" + secondValue);
+
+    const barLength =
+      550 * (videoRef.current.currentTime / videoRef.current.duration) - 10 / 2;
+    timer.current.style.marginLeft = `${barLength}px`;
   };
 
   const trackUp = (e) => {
@@ -130,7 +136,11 @@ function App() {
 
   const trackMove = (e) => {
     if (move) {
-      if (move.classList.contains("left")) {
+      if (
+        move.classList.contains("left") &&
+        e.clientX > ref.current.offsetLeft - 1 &&
+        e.clientX + 10 < timelineStyle.width + timelineStyle.marginLeft
+      ) {
         setTimelineStyle({
           marginLeft: e.clientX - ref.current.offsetLeft,
           width:
@@ -139,10 +149,19 @@ function App() {
             e.clientX +
             ref.current.offsetLeft,
         });
-      } else if (move.classList.contains("right")) {
+      } else if (
+        move.classList.contains("right") &&
+        e.clientX - ref.current.offsetLeft - timelineStyle.marginLeft > 20
+      ) {
         setTimelineStyle({
           ...timelineStyle,
-          width: e.clientX - ref.current.offsetLeft - timelineStyle.marginLeft,
+          width:
+            e.clientX > 550 + ref.current.offsetLeft
+              ? 550 +
+                ref.current.offsetLeft -
+                ref.current.offsetLeft -
+                timelineStyle.marginLeft
+              : e.clientX - ref.current.offsetLeft - timelineStyle.marginLeft,
         });
       }
     }
@@ -158,21 +177,20 @@ function App() {
           ></source>
           <p>Your browser does not support this video.</p>
         </video>
-        <div
-          className="band"
-          onMouseDown={(e) => timeline(e)}
-        >
-        <div className="timer" ref={timer}></div>
+        <div className="band" onMouseDown={(e) => timeline(e)}>
+          <div className="timer" ref={timer}></div>
         </div>
-        <div className="time">{videoTime} / {videoDuration}</div>
+        <div className="time">
+          {videoTime} / {videoDuration}
+        </div>
         <div className="constrols">
-
           <div className="stop" onClick={restartVideo}>
             <BsFillSkipStartFill />
           </div>
           <div className="play" onClick={() => setIsPlay(!isPlay)}>
             {isPlay ? <BsPauseFill /> : <BsPlayFill />}
-          </div>          <div className="stop" onClick={finishVideo}>
+          </div>{" "}
+          <div className="stop" onClick={finishVideo}>
             <BsFillSkipEndFill />
           </div>
           <div onClick={videoSpeed}>x{speed}</div>
@@ -182,10 +200,22 @@ function App() {
         </div>
         <div className="background-timeline">
           <div className="timeline" ref={timelineref} style={timelineStyle}>
-            <div className="resizer right" onMouseDown={(e)=> setMove(e.target)}></div>
-            <div className="resizer left" onMouseDown={(e)=> setMove(e.target)}></div>
+            <div
+              className="resizer right"
+              onMouseDown={(e) => setMove(e.target)}
+            ></div>
+            <div
+              className="resizer left"
+              onMouseDown={(e) => setMove(e.target)}
+            ></div>
           </div>
-        </div>
+        </div>{" "}
+        <BsArrowBarLeft
+          onClick={() => setTimelineStyle({ width: timelineStyle.width + timelineStyle.marginLeft, marginLeft: 0 })}
+        />
+        <BsArrowBarRight
+          onClick={() => setTimelineStyle({ ...timelineStyle, width: 550 - timelineStyle.marginLeft })}
+        />
       </div>
     </div>
   );
