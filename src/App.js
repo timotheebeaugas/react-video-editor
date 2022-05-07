@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useRef, useState, useEffect } from "react";
 import {
   BsPlayFill,
@@ -26,6 +27,7 @@ function App() {
   const [speed, setSpeed] = useState(1);
   const [isPlay, setIsPlay] = useState(false);
   const [isMute, setIsMute] = useState(false);
+  const [videoFile, setVideoFile] = useState();
 
   useEffect(() => {
     isPlay ? videoRef.current.play() : videoRef.current.pause();
@@ -167,8 +169,63 @@ function App() {
     }
   };
 
+  const videoPortion = () => {
+    //videoRef.current.currentTime = 12;
+    //videoRef.current.duration = (timelineStyle.width+timelineStyle.marginLeft)*videoRef.current.duration/550; get only
+  };
+  useEffect(() => {
+    videoPortion();
+  });
+
+  const sendVideo = (e) => {
+    e.preventDefault();
+    
+    console.log(videoFile);
+    let url = "http://localhost:3011/video";
+    let file = videoFile;
+    let formData = new FormData();
+    formData.append('file', file);
+
+    axios
+      .post(url, formData)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const sizeLimit = (e) => {
+    const maxAllowedSize = 10 * 1024 * 1024; // 10 Mo
+    let file = e.target;
+    if (
+      file.files.length === 1 &&
+      file.files[0].type === "video/mp4" &&
+      file.files[0].size < maxAllowedSize
+    ) {
+      setVideoFile(file.files[0]);
+    } else {
+      file.value = "";
+    }
+  };
+
   return (
     <div className="App" ref={ref} onMouseMove={trackMove} onMouseUp={trackUp}>
+
+      <form onSubmit={sendVideo} method="post">
+        <label htmlFor="video">Import video:</label>
+        <input
+          type="file"
+          id="video"
+          name="video"
+          accept="video/mp4"
+          onChange={sizeLimit}
+          required
+        ></input>
+        <input type="submit" value="Upload"></input>
+      </form>
+
       <div className="player">
         <video width="550" ref={videoRef}>
           <source
@@ -211,10 +268,20 @@ function App() {
           </div>
         </div>{" "}
         <BsArrowBarLeft
-          onClick={() => setTimelineStyle({ width: timelineStyle.width + timelineStyle.marginLeft, marginLeft: 0 })}
+          onClick={() =>
+            setTimelineStyle({
+              width: timelineStyle.width + timelineStyle.marginLeft,
+              marginLeft: 0,
+            })
+          }
         />
         <BsArrowBarRight
-          onClick={() => setTimelineStyle({ ...timelineStyle, width: 550 - timelineStyle.marginLeft })}
+          onClick={() =>
+            setTimelineStyle({
+              ...timelineStyle,
+              width: 550 - timelineStyle.marginLeft,
+            })
+          }
         />
       </div>
     </div>
