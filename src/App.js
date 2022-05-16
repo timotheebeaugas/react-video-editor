@@ -28,6 +28,7 @@ function App() {
   const [isPlay, setIsPlay] = useState(false);
   const [isMute, setIsMute] = useState(false);
   const [videoFile, setVideoFile] = useState();
+  const [videoId, setVideoId] = useState();
 
   useEffect(() => {
     isPlay ? videoRef.current.play() : videoRef.current.pause();
@@ -177,10 +178,22 @@ function App() {
     videoPortion();
   });
 
+  window.addEventListener("beforeunload", (e) => {   
+    //e.preventDefault();
+    if(videoId){
+    let url = "http://localhost:3011/video/"+videoId;
+    axios
+      .delete(url)
+      .then(function (response) {
+      })
+      .catch(function (error) {
+      })
+    }
+  });
+
   const sendVideo = (e) => {
     e.preventDefault();
     
-    console.log(videoFile);
     let url = "http://localhost:3011/video";
     let file = videoFile;
     let formData = new FormData();
@@ -189,10 +202,10 @@ function App() {
     axios
       .post(url, formData)
       .then(function (response) {
-        console.log(response);
+        setVideoId(response.data.file);
       })
       .catch(function (error) {
-        console.log(error);
+        
       });
   };
 
@@ -227,11 +240,12 @@ function App() {
       </form>
 
       <div className="player">
-        <video width="550" ref={videoRef}>
-          <source
-            src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"
+        
+        <video width="550" ref={videoRef}>{videoId ? 
+          <source 
+            src={"http://localhost:3011/video/"+videoId}
             type="video/mp4"
-          ></source>
+          ></source> :  null }
           <p>Your browser does not support this video.</p>
         </video>
         <div className="band" onMouseDown={(e) => timeline(e)}>
