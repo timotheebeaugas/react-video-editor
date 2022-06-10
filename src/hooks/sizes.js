@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 
-export function useDefaultWidth() {
+export const useDefaultWidth = () => {
     const [defaultWidth, setDefaultWidth] = useState();
 
     const widthBreakpoints = () => {
-      let pixels
-      if(window.innerWidth < 768){
-        pixels = window.innerWidth;
-      }else{
-        pixels = window.innerWidth / 2;
+
+      let pixels = window.innerWidth - 30
+
+      if(window.innerWidth > 768){
+        pixels = pixels / 2;
       }
       setDefaultWidth({width: pixels});
     }

@@ -1,0 +1,13 @@
+code
+favicon
+title
+test?
+comments
+
+immediat tasks
+play reinit counter
+stop counter when video finish
+
+component
+progress bar
+timeline

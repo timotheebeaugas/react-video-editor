@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-export function useTimer(isPlay, speed) {
+export const useTimer = (isPlay, speed) => {
     const [time, setTime] = useState(0);
 
     useEffect(() =>{
         if(isPlay){
             let inverval = setInterval(
-                () => setTime(time + 100 * speed)
+                () => setTime(time + 10 * speed)
             , 10);
             return ()=> {
                 clearInterval(inverval)
@@ -14,5 +14,5 @@ export function useTimer(isPlay, speed) {
         }
     })
 
-    return [time]
+    return [time, setTime]
 };
