@@ -10,7 +10,7 @@ export const useTimer = (isPlay, speed) => {
             , 10);
             return ()=> {
                 clearInterval(inverval)
-            };
+            }; 
         }
     })
 

@@ -121,7 +121,7 @@ function App() {
   }); */
 
   return (
-    <div className="App">
+    <div className="App" >
       <VideoUpload getVideoMetaData={getVideoMetaData} />
 
       <div className="player">

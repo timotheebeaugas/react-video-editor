@@ -11,3 +11,5 @@ stop counter when video finish
 component
 progress bar
 timeline
+
+google fonts icons
