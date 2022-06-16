@@ -5,6 +5,7 @@ export const Timeline = () => {
   const timelineref = useRef();
 
   const [timelineStyle, setTimelineStyle] = useState();
+  const [backgroundTimeline, setBackgroundTimeline] = useState();
 
   const [resizer, setResizer] = useState(false);
   const [mousePosition, setMousePosition] = useState();
@@ -13,7 +14,9 @@ export const Timeline = () => {
   useEffect(() => {
 
     setTimelineStyle({ width: timelineref.current.scrollWidth, left: 0 });
-    document.addEventListener("mousemove", (e) => setMousePosition(e))
+    setBackgroundTimeline(document.querySelector('.background-timeline').getBoundingClientRect());
+
+    document.addEventListener("mousemove", (e) => setMousePosition(e));
     document.addEventListener("mouseup", () => setResizer(null));
 
     return () => {
@@ -26,17 +29,15 @@ export const Timeline = () => {
   useEffect(() => {
     const trackMove = () => {
       let clientTimeline = document.querySelector('.timeline').getBoundingClientRect()
-      let backgroundTimeline = document.querySelector('.background-timeline').getBoundingClientRect()
-      console.log(timelineStyle, clientTimeline.width, previousMousePosition,mousePosition.pageX)
         if (
           resizer.target.classList.contains("left") 
           && mousePosition.pageX >= backgroundTimeline.left
           //&&
           /* mousePosition.pageX > timelineref.current.offsetLeft - 1  &&
           mousePosition.pageX + document.querySelector('.resizer').getBoundingClientRect().width <= timelineref.current.scrollWidth + timelineStyle.left*/
-        ) {
+        ) { 
         setTimelineStyle({
-            width: clientTimeline.width + (previousMousePosition - mousePosition.pageX),
+            width: clientTimeline.width + (( previousMousePosition ? previousMousePosition : backgroundTimeline.left ) - mousePosition.pageX),
             left: mousePosition.pageX - backgroundTimeline.left,
           })
           setPreviousMousePosition(mousePosition.pageX);
@@ -54,12 +55,24 @@ export const Timeline = () => {
         }
       };
 
-    if (resizer)            trackMove();
+    if (resizer) trackMove();
     
-  }, [resizer, mousePosition, timelineStyle, previousMousePosition]);
+  }, [resizer, mousePosition, timelineStyle, previousMousePosition, backgroundTimeline]);
 
   const resetTimeline = (side) => {
-    console.log(side);
+    let clientTimeline = document.querySelector('.timeline').getBoundingClientRect()
+    if(side === 'left'){
+      setTimelineStyle({
+        width: clientTimeline.width + clientTimeline.left - backgroundTimeline.left,
+        left: 0,
+      });
+      setPreviousMousePosition(mousePosition.pageX);
+    }else{
+      setTimelineStyle({
+        ...timelineStyle,
+        width: backgroundTimeline.width - clientTimeline.left + backgroundTimeline.left,
+      });
+    }
   };
 
   return (
