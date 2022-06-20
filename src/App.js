@@ -21,8 +21,8 @@ function App() {
 
   const [time, setTime] = useTimer(isPlay, speed);
 
-  const [videoId, setVideoId] = useState();
-  const [videoDuration, setVideoDuration] = useState();
+  const [videoId, setVideoId] = useState('1655746620576.mp4');
+  const [videoDuration, setVideoDuration] = useState(215551);
 
   const [isMute, setIsMute] = useState(false);
 
@@ -30,6 +30,16 @@ function App() {
     let videoData = response.data;
     setVideoId(videoData.file);
     setVideoDuration(videoData.duration);
+  }
+
+  const getTimelineMetaData= (obj) => {
+    let seconds = videoDuration / 1000
+    let timerUpadate = (obj.clientTimeline.left - obj.backgroundTimeline.left) * seconds / obj.backgroundTimeline.width;
+    let durationUpdate = obj.clientTimeline.width * seconds / obj.backgroundTimeline.width;
+    setIsPlay(false);
+    videoRef.current.pause();
+    videoRef.current.currentTime = timerUpadate;
+    console.log(timerUpadate, durationUpdate)
   }
 
   useEffect(() => {
@@ -158,7 +168,7 @@ function App() {
             {isMute ? <BsVolumeMuteFill /> : <BsVolumeUpFill />}
           </div>
         </div>
-        <Timeline />
+        <Timeline getTimelineMetaData={getTimelineMetaData} />
       </div>
     </div>
   );

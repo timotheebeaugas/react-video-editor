@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Tools } from "./Tools";
 
-export const Timeline = () => {
+export const Timeline = ({ getTimelineMetaData }) => {
   const timelineref = useRef();
 
   const [timelineStyle, setTimelineStyle] = useState();
@@ -31,10 +31,9 @@ export const Timeline = () => {
       let clientTimeline = document
         .querySelector(".timeline")
         .getBoundingClientRect();
-      console.log(clientTimeline);
       if (
         mousePosition.pageX >= backgroundTimeline.left && // does not exceed the left side
-        mousePosition.pageX <= backgroundTimeline.right // // does not exceed the right side
+        mousePosition.pageX <= backgroundTimeline.right // does not exceed the right side
       ) {
         if (
           resizer.target.classList.contains("left") && // which side
@@ -59,6 +58,10 @@ export const Timeline = () => {
             width: mousePosition.pageX - clientTimeline.left,
           });
         }
+        getTimelineMetaData({
+          backgroundTimeline,
+          clientTimeline
+        }); // send timeline's metadata to App for update timer and duration
       }
     };
 
@@ -69,6 +72,7 @@ export const Timeline = () => {
     timelineStyle,
     previousMousePosition,
     backgroundTimeline,
+    getTimelineMetaData,
   ]);
 
   const resetTimeline = (side) => {
