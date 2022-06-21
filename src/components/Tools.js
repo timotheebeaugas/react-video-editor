@@ -1,10 +1,10 @@
-import { BsArrowBarLeft, BsArrowBarRight } from "react-icons/bs";
+import { FirstPage, LastPage } from "./Icons";
 
 export const Tools = ({ resetTimeline }) => {
   return (
     <div>
-      <BsArrowBarLeft onClick={() => resetTimeline("left")} />
-      <BsArrowBarRight onClick={() => resetTimeline("right")} />
+      <FirstPage onClick={() => resetTimeline("left")} />
+      <LastPage onClick={() => resetTimeline("right")} />
     </div>
   );
 };

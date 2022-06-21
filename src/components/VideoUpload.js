@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { Download } from "./Icons";
 
 export const VideoUpload = ({getVideoMetaData}) => {
   const MAX_ALLOWED_FILE_SIZE = 10 * 1024 * 1024; // 10 Mo
@@ -36,7 +37,9 @@ export const VideoUpload = ({getVideoMetaData}) => {
   };
 
   return (
-    <form onSubmit={sendVideo} method="post">
+    <div>
+      <Download />
+      <form onSubmit={sendVideo} method="post">
       <label htmlFor="video">Import video:</label>
       <input
         type="file"
@@ -48,5 +51,6 @@ export const VideoUpload = ({getVideoMetaData}) => {
       ></input>
       <input type="submit" value="Upload"></input>
     </form>
+    </div>
   );
 };

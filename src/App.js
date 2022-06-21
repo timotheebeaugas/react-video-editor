@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
-  BsPlayFill,
-  BsPauseFill,
-  BsFillSkipStartFill,
-  BsFillSkipEndFill,
-  BsVolumeUpFill,
-  BsVolumeMuteFill,
-} from "react-icons/bs";
+  Next,
+  Pause,
+  Play,
+  Previous,
+  VolumeMute,
+  VolumeUp,
+} from "./components/Icons";
 import { Timeline } from "./components/Timeline";
 import { VideoUpload } from "./components/VideoUpload";
 import { useTimer } from "./hooks/timer";
@@ -21,7 +21,7 @@ function App() {
 
   const [time, setTime] = useTimer(isPlay, speed);
 
-  const [videoId, setVideoId] = useState('1655746620576.mp4');
+  const [videoId, setVideoId] = useState("1655746620576.mp4");
   const [videoDuration, setVideoDuration] = useState(215551);
 
   const [isMute, setIsMute] = useState(false);
@@ -30,17 +30,20 @@ function App() {
     let videoData = response.data;
     setVideoId(videoData.file);
     setVideoDuration(videoData.duration);
-  }
+  };
 
-  const getTimelineMetaData= (obj) => {
-    let seconds = videoDuration / 1000
-    let timerUpadate = (obj.clientTimeline.left - obj.backgroundTimeline.left) * seconds / obj.backgroundTimeline.width;
-    let durationUpdate = obj.clientTimeline.width * seconds / obj.backgroundTimeline.width;
+  const getTimelineMetaData = (obj) => {
+    let seconds = videoDuration / 1000;
+    let timerUpadate =
+      ((obj.clientTimeline.left - obj.backgroundTimeline.left) * seconds) /
+      obj.backgroundTimeline.width;
+    let durationUpdate =
+      (obj.clientTimeline.width * seconds) / obj.backgroundTimeline.width;
     setIsPlay(false);
     videoRef.current.pause();
     videoRef.current.currentTime = timerUpadate;
-    console.log(timerUpadate, durationUpdate)
-  }
+    console.log(timerUpadate, durationUpdate);
+  };
 
   useEffect(() => {
     isPlay ? videoRef.current.play() : videoRef.current.pause();
@@ -131,7 +134,7 @@ function App() {
   }); */
 
   return (
-    <div className="App" >
+    <div className="App">
       <VideoUpload getVideoMetaData={getVideoMetaData} />
 
       <div className="player">
@@ -144,10 +147,7 @@ function App() {
           ) : null}
           <p>Your browser does not support this video.</p>
         </video>
-        <div
-          
-          className="band"
-        >
+        <div className="band">
           <div className="timer" ref={timer}></div>
         </div>
         <div className="time">
@@ -155,17 +155,17 @@ function App() {
         </div>
         <div className="controls">
           <div className="stop" onClick={restartVideo}>
-            <BsFillSkipStartFill />
+            <Previous />
           </div>
           <div className="play" onClick={() => setIsPlay(!isPlay)}>
-            {isPlay ? <BsPauseFill /> : <BsPlayFill />}
+            {isPlay ? <Pause /> : <Play />}
           </div>
           <div className="stop" onClick={finishVideo}>
-            <BsFillSkipEndFill />
+            <Next />
           </div>
           <div onClick={videoSpeed}>x{speed}</div>
           <div onClick={() => setIsMute(!isMute)}>
-            {isMute ? <BsVolumeMuteFill /> : <BsVolumeUpFill />}
+            {isMute ? <VolumeMute /> : <VolumeUp />}
           </div>
         </div>
         <Timeline getTimelineMetaData={getTimelineMetaData} />
