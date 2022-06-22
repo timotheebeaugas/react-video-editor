@@ -14,17 +14,21 @@ import { timerFormat } from "./utils/timeFormat";
 
 function App() {
   const videoRef = useRef();
-  const timer = useRef();
 
   const [isPlay, setIsPlay] = useState(false);
   const [speed, setSpeed] = useState(1.0);
 
-  const [time, setTime] = useTimer(isPlay, speed);
+  const [time, setTime] = useTimer(isPlay, speed); // edit time VS time // video duration vs edited
 
   const [videoId, setVideoId] = useState("1655746620576.mp4");
   const [videoDuration, setVideoDuration] = useState(215551);
 
+  const [editVideoDuration, setEditVideoDuration] = useState();
+  const [editCurrentTime, setEditCurrentTime] = useState();
+
   const [isMute, setIsMute] = useState(false);
+
+  const [progressBarLenght, setProgressBarLenght] = useState({ width: 0 });
 
   const getVideoMetaData = (response) => {
     let videoData = response.data;
@@ -33,22 +37,20 @@ function App() {
   };
 
   const getTimelineMetaData = (obj) => {
-    let seconds = videoDuration / 1000;
+    //current timer edited vs curren timer normal
     let timerUpadate =
-      ((obj.clientTimeline.left - obj.backgroundTimeline.left) * seconds) /
+      ((obj.clientTimeline.left - obj.backgroundTimeline.left) *
+        videoDuration) /
       obj.backgroundTimeline.width;
     let durationUpdate =
-      (obj.clientTimeline.width * seconds) / obj.backgroundTimeline.width;
+      (obj.clientTimeline.width * videoDuration) / obj.backgroundTimeline.width;
     setIsPlay(false);
     videoRef.current.pause();
-    videoRef.current.currentTime = timerUpadate;
+    videoRef.current.currentTime = timerUpadate / 1000;
+    setEditCurrentTime(timerUpadate);
+    setEditVideoDuration(durationUpdate);
     console.log(timerUpadate, durationUpdate);
   };
-
-  useEffect(() => {
-    isPlay ? videoRef.current.play() : videoRef.current.pause();
-    videoRef.current.muted = isMute;
-  }, [isPlay, isMute]);
 
   const restartVideo = () => {
     setIsPlay(false);
@@ -67,59 +69,24 @@ function App() {
   };
 
   useEffect(() => {
+    isPlay ? videoRef.current.play() : videoRef.current.pause();
     videoRef.current.playbackRate = speed;
-  }, [speed]);
+    videoRef.current.muted = isMute;
+
+    let progressBar = document
+      .querySelector(".progress-bar")
+      .getBoundingClientRect().width;
+    let progress = (progressBar * time) / videoDuration;
+    setProgressBarLenght({width: progress});
+    console.log(progress);
+
+  }, [speed, isPlay, isMute, time, videoDuration]);
 
   const videoSpeed = (e) => {
     speed === 2.0 ? setSpeed(0.5) : setSpeed(speed + 0.5);
   };
 
-  /*     useEffect(() => {
-    let interval = window.setInterval(() => {
-      timeline();
-    }, 1);
-    return () => clearInterval(interval);
-  }, []); */
-
-  /*  const timeline = (e) => {
-    if (e) {
-      videoRef.current.currentTime =
-        ((e.pageX - e.target.getBoundingClientRect().left) *
-          videoRef.current.duration) /
-          ref.current.clientWidth;
-    }
-    let minutes = Math.floor(videoRef.current.currentTime / 60);
-    let seconds = Math.floor(videoRef.current.currentTime - minutes * 60);
-    let minuteValue;
-    let secondValue; 
-
-    if (minutes < 10) {
-      minuteValue = "0" + minutes;
-    } else {
-      minuteValue = minutes;
-    }
-
-    if (seconds < 10) {
-      secondValue = "0" + seconds;
-    } else {
-      secondValue = seconds;
-    }
-
-    setVideoTime(minuteValue + ":" + secondValue);
-
-    const barLength =
-    ref.current.clientWidth * (videoRef.current.currentTime / videoRef.current.duration) - 10 / 2;
-    timer.current.style.marginLeft = `${barLength}px`;
-  }; */
-
-  const videoPortion = () => {
-    //videoRef.current.currentTime = 12;
-    //videoRef.current.duration = (ref.current.clientWidth+timelineStyle.marginLeft)*videoRef.current.duration/ref.current.clientWidth; get only
-  };
-  useEffect(() => {
-    videoPortion();
-  });
-
+  /* REMOVE FILE BEFORE CLOSE TAB */
   /*   window.addEventListener("beforeunload", (e) => {   
     //e.preventDefault();
     if(videoId){
@@ -147,11 +114,14 @@ function App() {
           ) : null}
           <p>Your browser does not support this video.</p>
         </video>
-        <div className="band">
-          <div className="timer" ref={timer}></div>
+
+        <div className="progress-bar">
+          <div className="progress-bar-content" style={progressBarLenght}></div>
         </div>
+
         <div className="time">
-          {timerFormat(time)}/ {timerFormat(videoDuration)}
+          {timerFormat(editCurrentTime ? editCurrentTime : time)} /{" "}
+          {timerFormat(editVideoDuration ? editVideoDuration : videoDuration)}
         </div>
         <div className="controls">
           <div className="stop" onClick={restartVideo}>

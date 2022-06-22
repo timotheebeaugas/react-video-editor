@@ -27,7 +27,7 @@ export const Timeline = ({ getTimelineMetaData }) => {
   }, []);
 
   useEffect(() => {
-    const trackMove = () => {
+    if (resizer) {
       let clientTimeline = document
         .querySelector(".timeline")
         .getBoundingClientRect();
@@ -60,12 +60,10 @@ export const Timeline = ({ getTimelineMetaData }) => {
         }
         getTimelineMetaData({
           backgroundTimeline,
-          clientTimeline
+          clientTimeline,
         }); // send timeline's metadata to App for update timer and duration
       }
-    };
-
-    if (resizer) trackMove();
+    }
   }, [
     resizer,
     mousePosition,
@@ -95,6 +93,11 @@ export const Timeline = ({ getTimelineMetaData }) => {
           backgroundTimeline.left,
       });
     }
+    clientTimeline = backgroundTimeline;
+    getTimelineMetaData({
+      backgroundTimeline,
+      clientTimeline,
+    });
   };
 
   return (
