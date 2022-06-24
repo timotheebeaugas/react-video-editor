@@ -18,13 +18,14 @@ function App() {
   const [isPlay, setIsPlay] = useState(false);
   const [speed, setSpeed] = useState(1.0);
 
-  const [time, setTime] = useTimer(isPlay, speed); // edit time VS time // video duration vs edited
+  const [time, setTime] = useState(); // store time
+  const [editedCurrentTime, setEditedCurrentTime] = useTimer(isPlay, speed); // DECONJUGUER TIMER ET UPDATED  2nd HOOKS
+  const [chunk, setChunk] = useState();
 
   const [videoId, setVideoId] = useState("1655746620576.mp4");
-  const [videoDuration, setVideoDuration] = useState(215551);
 
-  const [editVideoDuration, setEditVideoDuration] = useState();
-  const [editCurrentTime, setEditCurrentTime] = useState();
+  const [videoDuration, setVideoDuration] = useState(215551);
+  const [editedVideoDuration, setEditedVideoDuration] = useState(215551);
 
   const [isMute, setIsMute] = useState(false);
 
@@ -34,38 +35,36 @@ function App() {
     let videoData = response.data;
     setVideoId(videoData.file);
     setVideoDuration(videoData.duration);
+    setEditedVideoDuration(videoData.duration);
   };
 
-  const getTimelineMetaData = (obj) => {
-    //current timer edited vs curren timer normal
-    let timerUpadate =
-      ((obj.clientTimeline.left - obj.backgroundTimeline.left) *
-        videoDuration) /
-      obj.backgroundTimeline.width;
-    let durationUpdate =
-      (obj.clientTimeline.width * videoDuration) / obj.backgroundTimeline.width;
+  const getTimelineChunk = (chunkStart, chunkEnd) => {
     setIsPlay(false);
     videoRef.current.pause();
-    videoRef.current.currentTime = timerUpadate / 1000;
-    setEditCurrentTime(timerUpadate);
-    setEditVideoDuration(durationUpdate);
-    console.log(timerUpadate, durationUpdate);
+    videoRef.current.currentTime = (chunkStart * videoDuration) / 1000;
+    setEditedCurrentTime(0);
+    setEditedVideoDuration(
+      chunkEnd * videoDuration - chunkStart * videoDuration
+    );
+    setChunk({chunkStart, chunkEnd});
   };
 
   const restartVideo = () => {
     setIsPlay(false);
     setSpeed(1);
     videoRef.current.pause();
-    videoRef.current.currentTime = 0;
-    setTime(0);
+    let newVideoTime = chunk ? chunk.chunkStart * videoDuration : 0;
+    videoRef.current.currentTime = newVideoTime / 1000;
+    setEditedCurrentTime(0);
   };
 
   const finishVideo = () => {
     setIsPlay(false);
     setSpeed(1);
     videoRef.current.pause();
-    videoRef.current.currentTime = videoRef.current.duration;
-    setTime(videoDuration);
+    let newVideoTime = chunk ? chunk.chunkEnd * videoDuration : videoDuration;
+    videoRef.current.currentTime = newVideoTime / 1000;
+    setEditedCurrentTime(newVideoTime - (chunk ? (chunk.chunkStart * videoDuration) : 0));
   };
 
   useEffect(() => {
@@ -75,15 +74,25 @@ function App() {
 
     let progressBar = document
       .querySelector(".progress-bar")
-      .getBoundingClientRect().width;
-    let progress = (progressBar * time) / videoDuration;
-    setProgressBarLenght({width: progress});
-    console.log(progress);
-
-  }, [speed, isPlay, isMute, time, videoDuration]);
+      .getBoundingClientRect();
+    let progress =
+      (progressBar.width * editedCurrentTime) / editedVideoDuration;
+    setProgressBarLenght({ width: progress });
+  }, [speed, isPlay, isMute, editedCurrentTime, editedVideoDuration]);
 
   const videoSpeed = (e) => {
     speed === 2.0 ? setSpeed(0.5) : setSpeed(speed + 0.5);
+  };
+
+  const updateProgressBar = (e) => {
+    let progressBar = document
+      .querySelector(".progress-bar")
+      .getBoundingClientRect();
+    let progress =
+      ((e.pageX - progressBar.left) * editedVideoDuration) / progressBar.width;
+    setEditedCurrentTime(progress);
+    let newVideoTime = chunk ? chunk.chunkStart * videoDuration : 0;
+    videoRef.current.currentTime = (progress + newVideoTime) / 1000;
   };
 
   /* REMOVE FILE BEFORE CLOSE TAB */
@@ -104,8 +113,8 @@ function App() {
     <div className="App">
       <VideoUpload getVideoMetaData={getVideoMetaData} />
 
-      <div className="player">
-        <video ref={videoRef}>
+      <div>
+        <video ref={videoRef} controls>
           {videoId ? (
             <source
               src={"http://localhost:3011/video/" + videoId}
@@ -115,13 +124,12 @@ function App() {
           <p>Your browser does not support this video.</p>
         </video>
 
-        <div className="progress-bar">
+        <div className="progress-bar" onMouseDown={(e) => updateProgressBar(e)}>
           <div className="progress-bar-content" style={progressBarLenght}></div>
         </div>
 
         <div className="time">
-          {timerFormat(editCurrentTime ? editCurrentTime : time)} /{" "}
-          {timerFormat(editVideoDuration ? editVideoDuration : videoDuration)}
+          {timerFormat(editedCurrentTime)} / {timerFormat(editedVideoDuration)}
         </div>
         <div className="controls">
           <div className="stop" onClick={restartVideo}>
@@ -138,7 +146,7 @@ function App() {
             {isMute ? <VolumeMute /> : <VolumeUp />}
           </div>
         </div>
-        <Timeline getTimelineMetaData={getTimelineMetaData} />
+        <Timeline getTimelineChunk={getTimelineChunk} />
       </div>
     </div>
   );

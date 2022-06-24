@@ -1,7 +1,8 @@
+import { useCallback } from "react";
 import { useEffect, useState, useRef } from "react";
 import { Tools } from "./Tools";
 
-export const Timeline = ({ getTimelineMetaData }) => {
+export const Timeline = ({ getTimelineChunk }) => {
   const timelineref = useRef();
 
   const [timelineStyle, setTimelineStyle] = useState();
@@ -25,6 +26,18 @@ export const Timeline = ({ getTimelineMetaData }) => {
       document.removeEventListener("mouseup", () => setResizer(null));
     };
   }, []);
+
+  const getTimelineMetaData = useCallback((backgroundTimeline, clientTimeline) => {
+    let normalizedLeft = clientTimeline.left - backgroundTimeline.left;
+    let normalizedRight = backgroundTimeline.right - backgroundTimeline.left;
+    let chunkStart = (((normalizedLeft * 100) / normalizedRight)) / 100; // multiplier
+
+    normalizedLeft = clientTimeline.right - backgroundTimeline.left;
+    normalizedRight = backgroundTimeline.right - backgroundTimeline.left;
+    let chunkEnd = (((normalizedLeft * 100) / normalizedRight)) / 100; // multiplier
+
+    getTimelineChunk(chunkStart, chunkEnd)
+  }, [getTimelineChunk]);
 
   useEffect(() => {
     if (resizer) {
@@ -58,10 +71,7 @@ export const Timeline = ({ getTimelineMetaData }) => {
             width: mousePosition.pageX - clientTimeline.left,
           });
         }
-        getTimelineMetaData({
-          backgroundTimeline,
-          clientTimeline,
-        }); // send timeline's metadata to App for update timer and duration
+        getTimelineMetaData(backgroundTimeline, clientTimeline) // send timeline's metadata to App for update timer and duration
       }
     }
   }, [
@@ -94,10 +104,7 @@ export const Timeline = ({ getTimelineMetaData }) => {
       });
     }
     clientTimeline = backgroundTimeline;
-    getTimelineMetaData({
-      backgroundTimeline,
-      clientTimeline,
-    });
+    getTimelineMetaData(backgroundTimeline, clientTimeline)
   };
 
   return (
