@@ -50,7 +50,7 @@ export const Timeline = ({ getTimelineChunk }) => {
       ) {
         if (
           resizer.target.classList.contains("left") && // which side
-          mousePosition.pageX < clientTimeline.right // does not collide right side
+          mousePosition.pageX < (clientTimeline.right - resizer.target.clientWidth)// does not collide right side
         ) {
           setTimelineStyle({
             width:
@@ -64,7 +64,7 @@ export const Timeline = ({ getTimelineChunk }) => {
           setPreviousMousePosition(mousePosition.pageX);
         } else if (
           resizer.target.classList.contains("right") && // which side
-          mousePosition.pageX > clientTimeline.left // does not collide right side
+          mousePosition.pageX > (clientTimeline.left + resizer.target.clientWidth) // does not collide right side
         ) {
           setTimelineStyle({
             ...timelineStyle,

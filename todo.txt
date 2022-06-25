@@ -4,7 +4,4 @@ title : video reduceur
 test?
 comments
 
-limit timer with work zone
-limite timeline collisition 10% ?
-duration error because can't find direction od timeline window (beginning or ending)
 change page/components hierarchy
