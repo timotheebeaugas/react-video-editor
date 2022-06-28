@@ -6,14 +6,20 @@ import {
   Previous,
   VolumeMute,
   VolumeUp,
+  FileUpload,
 } from "./components/Icons";
+import { useBreakpoints } from "./hooks/useBreakpoints";
 import { Timeline } from "./components/Timeline";
 import { VideoUpload } from "./components/VideoUpload";
-import { useTimer } from "./hooks/timer";
+import { useTimer } from "./hooks/useTimer";
 import { usePlay } from "./hooks/usePlay";
 import { timerFormat } from "./utils/timeFormat";
+import { SmallDevices } from "./components/SmallDevices";
+import { deleteVideo, getVideo, editVideo } from "./api";
 
 function App() {
+  const [isSmallDevices] = useBreakpoints();
+
   const videoRef = useRef();
 
   const [speed, setSpeed] = useState(1.0);
@@ -25,9 +31,15 @@ function App() {
 
   const [chunk, setChunk] = useState();
 
-  const [time, setTime] = useTimer(videoRef, chunk, videoDuration, editedVideoDuration)
+  const [time, setTime] = useTimer(
+    videoRef,
+    chunk,
+    videoDuration,
+    editedVideoDuration,
+    isSmallDevices
+  );
 
-  const [isPlay, setIsPlay] = usePlay(videoRef, editedVideoDuration, time)
+  const [isPlay, setIsPlay] = usePlay(videoRef, editedVideoDuration, time);
   const [isMute, setIsMute] = useState(false);
 
   const [progressBarLenght, setProgressBarLenght] = useState({ width: 0 });
@@ -46,7 +58,7 @@ function App() {
     setEditedVideoDuration(
       chunkEnd * videoDuration - chunkStart * videoDuration
     );
-    setChunk({chunkStart, chunkEnd});
+    setChunk({ chunkStart, chunkEnd });
   };
 
   const restartVideo = () => {
@@ -62,7 +74,7 @@ function App() {
     setSpeed(1);
     let newVideoTime = chunk ? chunk.chunkEnd * videoDuration : videoDuration;
     videoRef.current.currentTime = newVideoTime / 1000;
-    setTime(newVideoTime - (chunk ? (chunk.chunkStart * videoDuration) : 0));
+    setTime(newVideoTime - (chunk ? chunk.chunkStart * videoDuration : 0));
   };
 
   useEffect(() => {
@@ -72,8 +84,7 @@ function App() {
     let progressBar = document
       .querySelector(".progress-bar")
       .getBoundingClientRect();
-    let progress =
-      (progressBar.width * time) / editedVideoDuration;
+    let progress = (progressBar.width * time) / editedVideoDuration;
     setProgressBarLenght({ width: progress });
   }, [speed, isPlay, isMute, time, editedVideoDuration]);
 
@@ -92,59 +103,61 @@ function App() {
     videoRef.current.currentTime = (progress + newVideoTime) / 1000;
   };
 
+  
+  const downloadVideo = () => {
+    console.log(chunk)
+    editVideo(videoId, chunk)
+  };
+
   /* REMOVE FILE BEFORE CLOSE TAB */
   /*   window.addEventListener("beforeunload", (e) => {   
     //e.preventDefault();
     if(videoId){
-    let url = "http://localhost:3011/video/"+videoId;
-    axios
-      .delete(url)
-      .then(function (response) {
-      })
-      .catch(function (error) {
-      })
+      deleteVideo(videoId) 
     }
   }); */
+
+  if (isSmallDevices) {
+    return <SmallDevices />;
+  }
 
   return (
     <div className="App">
       <VideoUpload getVideoMetaData={getVideoMetaData} />
 
-      <div>
-        <video ref={videoRef} controls>
-          {videoId ? (
-            <source
-              src={"http://localhost:3011/video/" + videoId}
-              type="video/mp4"
-            ></source>
-          ) : null}
-          <p>Your browser does not support this video.</p>
-        </video>
+      <video ref={videoRef}>
+        {videoId ? (
+          <source src={getVideo(videoId)} type="video/mp4"></source>
+        ) : null}
+        <p>Your browser does not support this video.</p>
+      </video>
 
-        <div className="progress-bar" onMouseDown={(e) => updateProgressBar(e)}>
-          <div className="progress-bar-content" style={progressBarLenght}></div>
-        </div>
-
-        <div className="time">
-          {timerFormat(time)} / {timerFormat(editedVideoDuration)}
-        </div>
-        <div className="controls">
-          <div className="stop" onClick={restartVideo}>
-            <Previous />
-          </div>
-          <div className="play" onClick={() => setIsPlay(!isPlay)}>
-            {isPlay ? <Pause /> : <Play />}
-          </div>
-          <div className="stop" onClick={finishVideo}>
-            <Next />
-          </div>
-          <div onClick={videoSpeed}>x{speed}</div>
-          <div onClick={() => setIsMute(!isMute)}>
-            {isMute ? <VolumeMute /> : <VolumeUp />}
-          </div>
-        </div>
-        <Timeline getTimelineChunk={getTimelineChunk} />
+      <div className="progress-bar" onMouseDown={(e) => updateProgressBar(e)}>
+        <div className="progress-bar-content" style={progressBarLenght}></div>
       </div>
+
+      <div className="time">
+        {timerFormat(time)} / {timerFormat(editedVideoDuration)}
+      </div>
+      <div className="controls">
+        <div className="stop" onClick={restartVideo}>
+          <Previous />
+        </div>
+        <div className="play" onClick={() => setIsPlay(!isPlay)}>
+          {isPlay ? <Pause /> : <Play />}
+        </div>
+        <div className="stop" onClick={finishVideo}>
+          <Next />
+        </div>
+        <div onClick={videoSpeed}>x{speed}</div>
+        <div onClick={() => setIsMute(!isMute)}>
+          {isMute ? <VolumeMute /> : <VolumeUp />}
+        </div>
+      </div>
+      <Timeline getTimelineChunk={getTimelineChunk} />
+      <span onClick={downloadVideo}>
+        <FileUpload />
+      </span>
     </div>
   );
 }

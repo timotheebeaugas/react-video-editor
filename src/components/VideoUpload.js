@@ -1,26 +1,19 @@
-import axios from "axios";
 import { useState } from "react";
 import { Download } from "./Icons";
+import { postVideo } from "../api/index.js"
 
 export const VideoUpload = ({getVideoMetaData}) => {
   const MAX_ALLOWED_FILE_SIZE = 10 * 1024 * 1024; // 10 Mo
 
   const [videoFile, setVideoFile] = useState();
 
-  const sendVideo = (e) => {
+  const sendVideo = async (e) => {
     e.preventDefault();
 
-    let url = "http://localhost:3011/video";
     let file = videoFile;
     let formData = new FormData();
     formData.append("file", file); 
-
-    axios
-      .post(url, formData)
-      .then(function (response) {
-        getVideoMetaData(response);
-      }) 
-      .catch(function (error) {});
+    getVideoMetaData(await postVideo(formData));
   };
 
   const sizeLimit = (e) => {

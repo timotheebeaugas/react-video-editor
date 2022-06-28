@@ -1,7 +1,4 @@
 code
-favicon
-title : video reduceur
-test?
-comments
 
-change page/components hierarchy
+comments convention
+icon sharp

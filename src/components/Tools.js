@@ -1,6 +1,7 @@
 import { FirstPage, LastPage } from "./Icons";
 
 export const Tools = ({ resetTimeline }) => {
+
   return (
     <div>
       <span onClick={() => resetTimeline("left")}>
