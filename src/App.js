@@ -105,8 +105,7 @@ function App() {
 
   
   const downloadVideo = () => {
-    console.log(chunk)
-    editVideo(videoId, chunk)
+    editVideo(videoId, videoDuration, chunk)
   };
 
   /* REMOVE FILE BEFORE CLOSE TAB */
@@ -123,7 +122,7 @@ function App() {
 
   return (
     <div className="App">
-      <VideoUpload getVideoMetaData={getVideoMetaData} />
+      { !videoId ? null : <VideoUpload getVideoMetaData={getVideoMetaData} />      }
 
       <video ref={videoRef}>
         {videoId ? (

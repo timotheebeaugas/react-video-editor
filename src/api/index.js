@@ -14,6 +14,6 @@ export const deleteVideo = (videoId) => {
     axios.delete(API_BASE_URL + "video/" + videoId) // must be test
 };
 
-export const editVideo = (videoId, chunk) => {
-    return axios.post(API_BASE_URL + "edit", {fileName: videoId, chunk})
+export const editVideo = (videoId, videoDuration, chunk) => {
+    return axios.post(API_BASE_URL + "edit", {fileName: videoId, duration: videoDuration, chunk})
 };
