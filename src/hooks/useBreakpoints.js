@@ -4,7 +4,7 @@ export const useBreakpoints = () => {
   const [isSmallDevices, setIsSmallDevices] = useState(false);
 
   const widthBreakpoints = () => {
-    window.innerWidth > 76//8
+    window.innerWidth > 576 // X-Small Bottstrap
       ? setIsSmallDevices(false)
       : setIsSmallDevices(true);
   };

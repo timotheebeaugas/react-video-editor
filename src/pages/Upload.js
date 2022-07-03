@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download } from "./Icons";
+import { FileUpload } from "../components/Icons";
 import { postVideo } from "../api/index.js";
 
 export const VideoUpload = ({ getVideoMetaData }) => {
@@ -36,7 +36,7 @@ export const VideoUpload = ({ getVideoMetaData }) => {
 
   return (
     <div>
-      <Download />
+      <FileUpload />
       <form onSubmit={sendVideo} method="post">
         <label htmlFor="video">Import video:</label>
         <input
@@ -54,7 +54,7 @@ export const VideoUpload = ({ getVideoMetaData }) => {
           <input type="checkbox" name="user" id="robot" />
           <label htmlFor="robot">A robot</label>
           <input type="checkbox" name="user" id="human" />
-          <label htmlFor="human">A real person</label>
+          <label htmlFor="human">A human</label>
         </fieldset>
         <input type="submit" value="Upload"></input>
       </form>

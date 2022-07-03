@@ -7,13 +7,17 @@ export const postVideo = (formData) => {
 };
 
 export const getVideo = (videoId) => {
-  return API_BASE_URL + "video/" + videoId
-};
-
-export const deleteVideo = (videoId) => {
-    axios.delete(API_BASE_URL + "video/" + videoId) // must be test
+  return API_BASE_URL + "video/" + videoId;
 };
 
 export const editVideo = (videoId, videoDuration, chunk) => {
-    return axios.post(API_BASE_URL + "edit", {fileName: videoId, duration: videoDuration, chunk})
+  return axios.post(API_BASE_URL + "edit", {
+    fileName: videoId,
+    duration: videoDuration,
+    chunk,
+  });
+};
+
+export const getEditedVideo = (videoId) => {
+  return API_BASE_URL + "download/" + videoId;
 };
