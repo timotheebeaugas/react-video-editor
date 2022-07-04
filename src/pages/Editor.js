@@ -15,7 +15,7 @@ import { usePlay } from "../hooks/usePlay";
 import { timerFormat } from "../utils/timeFormat";
 import { getVideo, editVideo, getEditedVideo } from "../api";
 
-export const Editor = ({videoMetaData}) => {
+export const Editor = ({ videoMetaData }) => {
   const videoRef = useRef();
 
   const [isSmallDevices] = useBreakpoints();
@@ -161,9 +161,11 @@ export const Editor = ({videoMetaData}) => {
         </div>
       </div>
       <Timeline getTimelineChunk={getTimelineChunk} />
-      <span onClick={downloadVideo}>
-        <Download />
-      </span>
+      {chunk ? (
+        <span onClick={downloadVideo}>
+          <Download />
+        </span>
+      ) : null}
     </>
   );
 };
