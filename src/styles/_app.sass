@@ -1,59 +1,40 @@
-$myColor: red
+body, html
+  height: 100%
+  width: 100%
+  margin: 0
+  font-family: $main-font
+  background-color: $background-color
+  color: $font-color
+  @include flexbox-center-xy
 
-body 
-  background-color: grey
-  margin: 25px
-  
-h1  
-  color: $myColor
+svg
+  fill: $font-color
+
+svg:hover
+  fill: $font-color-hover
+  cursor: pointer
+
+svg:active
+  cursor: pointer
+  fill: $font-color-active
 
 .App
-  width: 500px
+  width: 576px
 
-.timeline 
-  background-color: blueviolet
-  height: 50px
-  position: relative
+input
+  accent-color: $font-color-active
 
-.progress-bar-content
-    background-color: red
-    height: 100%
-    position: relative
+input:hover
+  cursor: pointer
+  accent-color: $font-color-active
 
-.resizer 
-  width: 10px
-  height: 100%
-  position: absolute
-  cursor: e-resize
+label:hover
+  cursor: pointer
+  color: $font-color-hover
 
+.center
+  @include flexbox-center-xy
 
-.constrols 
-  white-space: nowrap
-
-
-.constrols div 
-  display: inline-block
-  margin: 0 10px
-
-
-.resizer:nth-child(1) 
-  right: 0
-
-
-.resizer:nth-child(2) 
-  left: 0
-
-
-.background-timeline 
-  background-color: bisque
-
-
-.icon 
-  color: white
-  font-size: 25px
-
-.progress-bar
-  height: 15px
-  background-color: white
-  margin: 5px 0
-
+.icons
+  height: 24px
+  width: 24px

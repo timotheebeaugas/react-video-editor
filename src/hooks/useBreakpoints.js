@@ -10,6 +10,7 @@ export const useBreakpoints = () => {
   };
 
   useEffect(() => {
+    widthBreakpoints();
     window.addEventListener("resize", () => {
       widthBreakpoints();
     });
@@ -19,6 +20,6 @@ export const useBreakpoints = () => {
       });
     };
   }, []);
-
+ 
   return [isSmallDevices];
 };

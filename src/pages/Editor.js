@@ -27,13 +27,15 @@ export const Editor = ({ videoMetaData }) => {
   const [videoDuration, setVideoDuration] = useState();
   const [editedVideoDuration, setEditedVideoDuration] = useState();
 
-  useEffect(() => {
+    useEffect(() => {
     setVideoId(videoMetaData.file);
     setVideoDuration(videoMetaData.duration);
     setEditedVideoDuration(videoMetaData.duration);
   }, [videoMetaData]);
 
   const [chunk, setChunk] = useState();
+
+  const [showIcon, setShowIcon] = useState(false);
 
   const [time, setTime] = useTimer(
     videoRef,
@@ -48,13 +50,6 @@ export const Editor = ({ videoMetaData }) => {
 
   const [progressBarLenght, setProgressBarLenght] = useState({ width: 0 });
 
-  /*     const getVideoMetaData = (response) => {
-      let videoData = response.data;
-      setVideoId(videoData.file);
-      setVideoDuration(videoData.duration);
-      setEditedVideoDuration(videoData.duration);
-    }; */
-
   const getTimelineChunk = (chunkStart, chunkEnd) => {
     setIsPlay(false);
     videoRef.current.currentTime = (chunkStart * videoDuration) / 1000;
@@ -63,6 +58,7 @@ export const Editor = ({ videoMetaData }) => {
       chunkEnd * videoDuration - chunkStart * videoDuration
     );
     setChunk({ chunkStart, chunkEnd });
+    setShowIcon(true)
   };
 
   const restartVideo = () => {
@@ -108,6 +104,8 @@ export const Editor = ({ videoMetaData }) => {
   };
 
   const downloadVideo = async () => {
+    setShowIcon(false)
+
     let response = await editVideo(videoId, videoDuration, chunk);
 
     if (response.status === 200) {
@@ -122,6 +120,8 @@ export const Editor = ({ videoMetaData }) => {
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
+
+      setShowIcon(true)
     }
   };
 
@@ -143,9 +143,14 @@ export const Editor = ({ videoMetaData }) => {
       </div>
 
       <div className="time">
-        {timerFormat(time)} / {timerFormat(editedVideoDuration)}
+        <div>{timerFormat(time)}</div>
+        <div>{timerFormat(editedVideoDuration)}</div>
       </div>
+
       <div className="controls">
+        <div onClick={() => setIsMute(!isMute)}>
+          {isMute ? <VolumeMute /> : <VolumeUp />}
+        </div>
         <div className="stop" onClick={restartVideo}>
           <Previous />
         </div>
@@ -155,17 +160,19 @@ export const Editor = ({ videoMetaData }) => {
         <div className="stop" onClick={finishVideo}>
           <Next />
         </div>
-        <div onClick={videoSpeed}>x{speed}</div>
-        <div onClick={() => setIsMute(!isMute)}>
-          {isMute ? <VolumeMute /> : <VolumeUp />}
+        <div onClick={videoSpeed} className="speed">x{speed}</div>
+      </div>
+
+      <Timeline getTimelineChunk={getTimelineChunk} />
+      <div className="center">
+        <div className="icons">
+          {(chunk && showIcon) ? (
+            <span onClick={downloadVideo}>
+              <Download />
+            </span>
+          ) : null}
         </div>
       </div>
-      <Timeline getTimelineChunk={getTimelineChunk} />
-      {chunk ? (
-        <span onClick={downloadVideo}>
-          <Download />
-        </span>
-      ) : null}
     </>
   );
 };

@@ -1,4 +1,4 @@
-# API FFmpeg
+# Video editor
 Small video editing application built with React 18. The user can upload a small video and trim her then download the edited result. A basic honeypot has been added to the start form to avoid robots.   
 Furthermore the video controls have been customized.   
 This application need to connect with an API to run.   
@@ -10,14 +10,14 @@ Uses node `14.17.0`.
 
     .
     ├── public                              # resources for website root
-    └── src                                 # main application files  
-        └── api                             # Axios requests to the API
-        └── components                      # components
-        └── pages                           # app pages
-        └── styles                          # SASS styles sheet
-        └── utils                           # useful functions
-        └── App.js                          # main component
-        └── index.js                        # index
+    ├── src                                 # main application files  
+    |   └── api                             # Axios requests to the API
+    |   └── components                      # components
+    |   └── pages                           # app pages
+    |   └── styles                          # SASS styles sheet
+    |   └── utils                           # useful functions
+    |   └── App.js                          # main component
+    |   └── index.js                        # index
     └── README.md                           # instructions
 
 
@@ -26,7 +26,7 @@ Uses node `14.17.0`.
 npm install  
 ```
 
-### Run react script 
+### Run react  
 ```
 npm start  
 ```

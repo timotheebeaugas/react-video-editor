@@ -29,6 +29,8 @@ export const VideoUpload = ({ getVideoMetaData }) => {
       file.files[0].size < MAX_ALLOWED_FILE_SIZE
     ) {
       setVideoFile(file.files[0]);
+      const element = document.querySelector("svg");
+      element.style.fill = "#2D8CEA";
     } else {
       file.value = "";
     }
@@ -36,27 +38,41 @@ export const VideoUpload = ({ getVideoMetaData }) => {
 
   return (
     <div>
-      <FileUpload />
       <form onSubmit={sendVideo} method="post">
-        <label htmlFor="video">Import video:</label>
-        <input
-          type="file"
-          id="video"
-          name="video"
-          accept="video/mp4"
-          onChange={sizeLimit}
-          required
-        ></input>
+        <fieldset>
+          <legend htmlFor="videoUpload">Import video:</legend>
+          <div className="uploadFile">
+            <FileUpload className="svg" />
+            <input
+              type="file"
+              id="videoUpload"
+              name="videoUpload"
+              accept="video/mp4"
+              onChange={sizeLimit}
+              required
+            ></input>
+          </div>
+        </fieldset>
         <fieldset>
           <legend>Who are you ?</legend>
-          <input type="checkbox" name="user" id="animal" />
-          <label htmlFor="animal">An animal</label>
-          <input type="checkbox" name="user" id="robot" />
-          <label htmlFor="robot">A robot</label>
-          <input type="checkbox" name="user" id="human" />
-          <label htmlFor="human">A human</label>
+          <div className="center">
+            <div>
+              <input type="checkbox" name="user" id="animal" />
+              <label htmlFor="animal">An animal</label>
+            </div>
+            <div>
+              <input type="checkbox" name="user" id="robot" />
+              <label htmlFor="robot">A robot</label>
+            </div>
+            <div>
+              <input type="checkbox" name="user" id="human" />
+              <label htmlFor="human">A human</label>
+            </div>
+          </div>
         </fieldset>
-        <input type="submit" value="Upload"></input>
+        <div className="center">
+          <input type="submit" value="Upload"></input>
+        </div>
       </form>
     </div>
   );
